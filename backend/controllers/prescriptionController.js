@@ -29,8 +29,9 @@ exports.createPrescription = async (req, res) => {
 
     await prescription.save();
 
-    // Mark appointment as completed
+    // Mark appointment as completed and paid
     appointment.status = 'Completed';
+    appointment.paymentStatus = 'Paid';
     if (fee !== undefined) {
       appointment.fee = Number(fee);
     }

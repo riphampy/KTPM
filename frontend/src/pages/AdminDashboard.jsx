@@ -20,9 +20,11 @@ function AdminDashboard({ activeTab, setActiveTab }) {
   const [dashboardTab, setDashboardTab] = useState(0);
 
   useEffect(() => {
-    fetchStats();
-    fetchUpcoming();
-  }, []);
+    if (activeTab === 0) {
+      fetchStats();
+      fetchUpcoming();
+    }
+  }, [activeTab]);
 
   const fetchUpcoming = async () => {
     try {
