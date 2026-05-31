@@ -95,8 +95,15 @@ exports.updateAppointmentStatus = async (req, res) => {
           <p>Lịch khám của bạn vào ngày <strong>${new Date(appointment.date).toLocaleDateString('vi-VN')}</strong> (Ca: ${appointment.shift}) ${statusText}.</p>
           <p>Trân trọng!</p>
         `;
-        emailService.sendEmail(appointment.patientId.email, 'Cập nhật trạng thái lịch khám - Smart Hospital', emailHtml);
+        try {
+          await emailService.sendEmail(appointment.patientId.email, 'Cập nhật trạng thái lịch khám - Smart Hospital', emailHtml);
+          console.log('[Email] Status update email sent successfully.');
+        } catch (mailErr) {
+          console.error('[Email] Error sending status update email:', mailErr);
+        }
       }
+    } else {
+      console.log('[Email] Warning: patientId or email is missing, cannot send status email.');
     }
 
     res.json(appointment);
