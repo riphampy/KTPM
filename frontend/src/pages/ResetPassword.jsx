@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Alert, CircularProgress } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -26,7 +26,7 @@ function ResetPassword() {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/reset-password', { 
+      const response = await api.post('/auth/reset-password', { 
         id, token, newPassword: password 
       });
       setMessage(response.data.message);

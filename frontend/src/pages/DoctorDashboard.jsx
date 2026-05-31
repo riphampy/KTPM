@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Grid, TextField, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab } from '@mui/material';
-import axios from 'axios';
+import api from '../utils/api';
 
 function DoctorDashboard({ user, activeTab }) {
   const [date, setDate] = useState('');
@@ -17,7 +17,7 @@ function DoctorDashboard({ user, activeTab }) {
 
   const fetchSchedules = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/schedules/doctor/${user.id}`);
+      const res = await api.get(`/schedules/doctor/${user.id}`);
       setSchedules(res.data);
     } catch (err) { console.error(err); }
   };
@@ -25,9 +25,7 @@ function DoctorDashboard({ user, activeTab }) {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/appointments/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/appointments/my`);
       setAppointments(res.data);
     } catch (err) { console.error(err); }
   };
@@ -41,9 +39,7 @@ function DoctorDashboard({ user, activeTab }) {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/schedules', { date, shift }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/schedules', { date, shift });
       alert('Thêm lịch làm việc thành công');
       fetchSchedules();
     } catch (err) {
@@ -54,9 +50,7 @@ function DoctorDashboard({ user, activeTab }) {
   const handleStatusChange = async (appId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/appointments/${appId}/status`, { status: newStatus }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/appointments/${appId}/status`, { status: newStatus });
       fetchAppointments();
     } catch (err) {
       alert('Lỗi: ' + (err.response?.data?.message || err.message));
@@ -71,9 +65,7 @@ function DoctorDashboard({ user, activeTab }) {
   const handleViewRecords = async (patient) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/records/${patient._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/records/${patient._id}`);
       setSharedRecords(res.data);
       setOpenRecordsDialog(true);
     } catch (err) {
@@ -84,13 +76,11 @@ function DoctorDashboard({ user, activeTab }) {
   const submitPrescription = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/prescriptions', {
+      await api.post('/prescriptions', {
         appointmentId: selectedAppt._id,
         diagnosis,
         medications: [{ name: medications, dosage: 'Theo chỉ định', duration: '7 ngày', instructions: '' }],
         notes
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       alert('Kê đơn thành công!');
       setOpenDialog(false);

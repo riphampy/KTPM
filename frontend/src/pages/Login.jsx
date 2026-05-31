@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, TextField, Typography, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
+import { AuthContext } from '../context/AuthContext';
 
 function Login() {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -11,12 +13,11 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await api.post('/auth/login', {
         email,
         password
       });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      login(response.data.token, response.data.user);
       window.location.href = '/dashboard';
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi đăng nhập');

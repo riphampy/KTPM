@@ -1,6 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -10,6 +12,17 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Security Headers
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau 15 phút'
+});
+app.use('/api', limiter); // Apply to all /api routes
 
 // Body parser
 app.use(express.json());

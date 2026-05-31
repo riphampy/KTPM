@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 
 // Premium Medical Theme
 const theme = createTheme({
@@ -65,26 +66,36 @@ const theme = createTheme({
   },
 });
 
-function App() {
-  const isAuthenticated = !!localStorage.getItem('token');
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <div>Loading...</div>;
+  return user ? children : <Navigate to="/login" />;
+};
 
+function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route 
-            path="/dashboard" 
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

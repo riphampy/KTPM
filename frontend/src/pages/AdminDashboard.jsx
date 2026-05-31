@@ -6,7 +6,7 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import PeopleIcon from '@mui/icons-material/People';
 import BookOnlineIcon from '@mui/icons-material/BookOnline';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import axios from 'axios';
+import api from '../utils/api';
 
 function AdminDashboard({ activeTab }) {
   const [stats, setStats] = useState({ totalDoctors: 0, totalPatients: 0, totalAppointments: 0, todaySessions: 0 });
@@ -18,9 +18,7 @@ function AdminDashboard({ activeTab }) {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/reports/stats', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/reports/stats');
       if (res.data) {
         setStats({
           totalDoctors: res.data.totalDoctors || 0,

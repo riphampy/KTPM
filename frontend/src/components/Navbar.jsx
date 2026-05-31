@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 function Navbar() {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const { user, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -20,7 +20,7 @@ function Navbar() {
           <span style={{ fontSize: '0.8rem', letterSpacing: '1px', opacity: 0.9 }}>| THE ECHANNELING PROJECT</span>
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          {token ? (
+          {user ? (
             <>
               <Button color="inherit" component={Link} to="/dashboard" sx={{ color: 'white', fontWeight: 600 }}>QUẢN LÝ</Button>
               <Button color="inherit" onClick={handleLogout} sx={{ color: 'white', fontWeight: 600 }}>ĐĂNG XUẤT</Button>

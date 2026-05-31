@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Container } from '@mui/material';
 import DoctorDashboard from './DoctorDashboard';
 import PatientDashboard from './PatientDashboard';
 import AdminDashboard from './AdminDashboard';
 import Sidebar from '../components/Sidebar';
+import { AuthContext } from '../context/AuthContext';
 
 function Dashboard() {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState(0);
 
   return (

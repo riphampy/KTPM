@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Grid, List, ListItem, ListItemText, ListItemButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, Chip } from '@mui/material';
-import axios from 'axios';
+import api from '../utils/api';
 
 function PatientDashboard({ user, activeTab }) {
   const [doctors, setDoctors] = useState([]);
@@ -21,7 +21,7 @@ function PatientDashboard({ user, activeTab }) {
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users/doctors');
+      const res = await api.get('/users/doctors');
       setDoctors(res.data);
     } catch (err) { console.error(err); }
   };
@@ -29,9 +29,7 @@ function PatientDashboard({ user, activeTab }) {
   const fetchMyAppointments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/appointments/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/appointments/my`);
       setAppointments(res.data);
     } catch (err) { console.error(err); }
   };
@@ -39,9 +37,7 @@ function PatientDashboard({ user, activeTab }) {
   const fetchPrescriptions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/prescriptions/patient/${user.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/prescriptions/patient/${user.id}`);
       setPrescriptions(res.data);
     } catch (err) { console.error(err); }
   };
@@ -49,7 +45,7 @@ function PatientDashboard({ user, activeTab }) {
   const handleSelectDoctor = async (doctor) => {
     setSelectedDoctor(doctor);
     try {
-      const res = await axios.get(`http://localhost:5000/api/schedules/doctor/${doctor._id}`);
+      const res = await api.get(`/schedules/doctor/${doctor._id}`);
       setSchedules(res.data);
     } catch (err) { console.error(err); }
   };
@@ -62,14 +58,12 @@ function PatientDashboard({ user, activeTab }) {
   const submitBooking = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/appointments', {
+      await api.post('/appointments', {
         doctorId: selectedDoctor._id,
         scheduleId: selectedSchedule._id,
         date: selectedSchedule.date,
         shift: selectedSchedule.shift,
         symptoms
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       alert('Đặt lịch thành công! Vui lòng chờ bác sĩ xác nhận.');
       setOpenDialog(false);

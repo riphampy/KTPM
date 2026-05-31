@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, Select, MenuItem, FormControl, Grid } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 
 function Register() {
   const [name, setName] = useState('');
@@ -19,7 +19,7 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', {
+      await api.post('/auth/register', {
         name, email, password, role, phone, dateOfBirth, gender, address, bloodType
       });
       alert('Đăng ký thành công! Vui lòng đăng nhập.');
