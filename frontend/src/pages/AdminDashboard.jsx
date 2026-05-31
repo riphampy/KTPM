@@ -102,7 +102,7 @@ function AdminDashboard() {
           </Box>
           
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <Card sx={{ bgcolor: '#e3f2fd' }}>
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>Tổng số Bệnh nhân</Typography>
@@ -110,7 +110,7 @@ function AdminDashboard() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <Card sx={{ bgcolor: '#f3e5f5' }}>
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>Tổng số Bác sĩ</Typography>
@@ -118,11 +118,21 @@ function AdminDashboard() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <Card sx={{ bgcolor: '#e8f5e9' }}>
                 <CardContent>
                   <Typography color="text.secondary" gutterBottom>Lịch khám Hoàn thành</Typography>
                   <Typography variant="h3" color="secondary">{stats.completedAppointments}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Card sx={{ bgcolor: '#fff3e0' }}>
+                <CardContent>
+                  <Typography color="text.secondary" gutterBottom>Tổng Doanh thu (VNĐ)</Typography>
+                  <Typography variant="h4" color="warning.main">
+                    {new Intl.NumberFormat('vi-VN').format(stats.totalRevenue)}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>

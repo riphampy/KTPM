@@ -8,6 +8,11 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('patient');
+  const [phone, setPhone] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [gender, setGender] = useState('Male');
+  const [address, setAddress] = useState('');
+  const [bloodType, setBloodType] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -18,7 +23,12 @@ function Register() {
         name,
         email,
         password,
-        role
+        role,
+        phone,
+        dateOfBirth,
+        gender,
+        address,
+        bloodType
       });
       alert('Đăng ký thành công! Vui lòng đăng nhập.');
       navigate('/login');
@@ -81,6 +91,19 @@ function Register() {
               <MenuItem value="doctor">Bác sĩ</MenuItem>
             </Select>
           </FormControl>
+          
+          <TextField margin="normal" fullWidth label="Số điện thoại" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <TextField margin="normal" fullWidth label="Ngày sinh" type="date" InputLabelProps={{ shrink: true }} value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="gender-label">Giới tính</InputLabel>
+            <Select labelId="gender-label" value={gender} label="Giới tính" onChange={(e) => setGender(e.target.value)}>
+              <MenuItem value="Male">Nam</MenuItem>
+              <MenuItem value="Female">Nữ</MenuItem>
+              <MenuItem value="Other">Khác</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField margin="normal" fullWidth label="Địa chỉ" value={address} onChange={(e) => setAddress(e.target.value)} />
+          <TextField margin="normal" fullWidth label="Nhóm máu (VD: O, A, B, AB)" value={bloodType} onChange={(e) => setBloodType(e.target.value)} />
           <Button
             type="submit"
             fullWidth

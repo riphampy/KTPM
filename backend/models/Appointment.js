@@ -7,7 +7,8 @@ const appointmentSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   shift: { type: String, required: true },
   symptoms: { type: String },
-  status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'], default: 'Pending' }
+  status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'], default: 'Pending' },
+  fee: { type: Number, default: 150000 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

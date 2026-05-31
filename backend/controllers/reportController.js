@@ -30,10 +30,18 @@ exports.getDashboardStats = async (req, res) => {
       { $project: { name: '$patientInfo.name', email: '$patientInfo.email', visitCount: '$count' } }
     ]);
 
+    // Tổng doanh thu
+    const revenueResult = await Appointment.aggregate([
+      { $match: { status: 'Completed' } },
+      { $group: { _id: null, totalRevenue: { $sum: '$fee' } } }
+    ]);
+    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+
     res.json({
       totalPatients,
       totalDoctors,
       completedAppointments,
+      totalRevenue,
       topDoctors,
       topPatients
     });

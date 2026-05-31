@@ -5,5 +5,6 @@ const { authMiddleware, roleMiddleware } = require('../middlewares/authMiddlewar
 
 router.get('/doctors', userController.getDoctors);
 router.get('/', authMiddleware, roleMiddleware(['admin']), userController.getAllUsers);
+router.put('/profile', authMiddleware, userController.updateProfile);
 
 module.exports = router;

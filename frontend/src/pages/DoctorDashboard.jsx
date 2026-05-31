@@ -13,6 +13,8 @@ function DoctorDashboard({ user }) {
   const [diagnosis, setDiagnosis] = useState('');
   const [medications, setMedications] = useState('');
   const [notes, setNotes] = useState('');
+  const [sharedRecords, setSharedRecords] = useState([]);
+  const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
 
   const fetchSchedules = async () => {
     try {
@@ -65,6 +67,19 @@ function DoctorDashboard({ user }) {
   const handlePrescribe = (app) => {
     setSelectedAppt(app);
     setOpenDialog(true);
+  };
+
+  const handleViewRecords = async (patient) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`http://localhost:5000/api/records/${patient._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSharedRecords(res.data);
+      setOpenRecordsDialog(true);
+    } catch (err) {
+      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+    }
   };
 
   const submitPrescription = async () => {
@@ -218,6 +233,7 @@ function DoctorDashboard({ user }) {
                     <TableCell>{app.shift}</TableCell>
                     <TableCell>{app.symptoms}</TableCell>
                     <TableCell align="right">
+                      <Button size="small" variant="outlined" color="info" sx={{ mr: 1 }} onClick={() => handleViewRecords(app.patientId)}>Xem Hồ Sơ</Button>
                       <Button className="btn-soft" size="small" variant="contained" onClick={() => handlePrescribe(app)}>Khám & Kê đơn</Button>
                     </TableCell>
                   </TableRow>
@@ -274,6 +290,44 @@ function DoctorDashboard({ user }) {
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={() => setOpenDialog(false)}>Hủy</Button>
           <Button onClick={submitPrescription} variant="contained" color="primary">Hoàn tất Khám & Lưu đơn</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog Hồ sơ dùng chung */}
+      <Dialog open={openRecordsDialog} onClose={() => setOpenRecordsDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ bgcolor: 'info.main', color: 'white' }}>Hồ sơ sức khỏe liên khoa</DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          {sharedRecords.length === 0 ? (
+            <Typography>Bệnh nhân chưa có lịch sử khám bệnh nào.</Typography>
+          ) : (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Ngày khám</TableCell>
+                    <TableCell>Khoa</TableCell>
+                    <TableCell>Bác sĩ</TableCell>
+                    <TableCell>Chẩn đoán</TableCell>
+                    <TableCell>Đơn thuốc</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sharedRecords.map(record => (
+                    <TableRow key={record._id}>
+                      <TableCell>{new Date(record.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{record.doctorId?.departmentId?.name || 'Chưa rõ'}</TableCell>
+                      <TableCell>{record.doctorId?.name}</TableCell>
+                      <TableCell>{record.diagnosis}</TableCell>
+                      <TableCell>{record.medications?.map(m => m.name).join(', ')}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setOpenRecordsDialog(false)}>Đóng</Button>
         </DialogActions>
       </Dialog>
     </Box>

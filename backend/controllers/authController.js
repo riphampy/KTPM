@@ -7,7 +7,7 @@ const emailService = require('../services/emailService');
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone, dateOfBirth, gender, address, bloodType, departmentId } = req.body;
     
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -24,7 +24,13 @@ exports.register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || 'patient'
+      role: role || 'patient',
+      phone,
+      dateOfBirth,
+      gender,
+      address,
+      bloodType,
+      departmentId
     });
 
     await user.save();
