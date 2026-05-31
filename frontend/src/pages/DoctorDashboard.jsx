@@ -58,6 +58,18 @@ function DoctorDashboard({ user, activeTab }) {
     }
   };
 
+  const handleDeleteSchedule = async (scheduleId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa ca khám này? (Nếu đã có người đặt, lịch hẹn sẽ tự động bị hủy và gửi email báo cho bệnh nhân)')) return;
+    try {
+      await api.delete(`/schedules/${scheduleId}`);
+      alert('Đã xóa ca khám thành công');
+      fetchSchedules();
+      fetchAppointments(); // Refresh in case an appointment was cancelled
+    } catch (err) {
+      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
   const handlePrescribe = (app) => {
     setSelectedAppt(app);
     setOpenDialog(true);
@@ -134,6 +146,7 @@ function DoctorDashboard({ user, activeTab }) {
                       <TableCell>Ngày</TableCell>
                       <TableCell>Ca làm việc</TableCell>
                       <TableCell>Trạng thái</TableCell>
+                      <TableCell align="right">Hành động</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -146,9 +159,12 @@ function DoctorDashboard({ user, activeTab }) {
                             {s.isAvailable ? 'Còn trống' : 'Đã kín'}
                           </Typography>
                         </TableCell>
+                        <TableCell align="right">
+                          <Button size="small" variant="outlined" color="error" onClick={() => handleDeleteSchedule(s._id)}>Xóa</Button>
+                        </TableCell>
                       </TableRow>
                     ))}
-                    {schedules.length === 0 && <TableRow><TableCell colSpan={3}>Chưa có lịch rảnh</TableCell></TableRow>}
+                    {schedules.length === 0 && <TableRow><TableCell colSpan={4}>Chưa có lịch rảnh</TableCell></TableRow>}
                   </TableBody>
                 </Table>
               </TableContainer>

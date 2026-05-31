@@ -2,7 +2,7 @@ const User = require('../models/User');
 
 exports.getDoctors = async (req, res) => {
   try {
-    const doctors = await User.find({ role: 'doctor' }).select('-password');
+    const doctors = await User.find({ role: 'doctor', isActive: { $ne: false } }).select('-password');
     res.json(doctors);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
@@ -11,7 +11,7 @@ exports.getDoctors = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password');
+    const users = await User.find({ isActive: { $ne: false } }).select('-password');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
@@ -67,9 +67,9 @@ exports.createUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findByIdAndDelete(id);
+    const user = await User.findByIdAndUpdate(id, { isActive: false }, { new: true });
     if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
-    res.json({ message: 'Xóa người dùng thành công' });
+    res.json({ message: 'Khóa người dùng thành công' });
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }

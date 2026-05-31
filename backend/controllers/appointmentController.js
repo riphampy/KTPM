@@ -8,9 +8,14 @@ exports.bookAppointment = async (req, res) => {
     const { doctorId, scheduleId, date, shift, symptoms } = req.body;
     const patientId = req.user.id;
 
-    // Check if schedule is still available
-    const schedule = await DoctorSchedule.findById(scheduleId);
-    if (!schedule || !schedule.isAvailable) {
+    // Atomically check and update schedule availability
+    const schedule = await DoctorSchedule.findOneAndUpdate(
+      { _id: scheduleId, doctorId: doctorId, isAvailable: true },
+      { $set: { isAvailable: false } },
+      { new: true }
+    );
+
+    if (!schedule) {
       return res.status(400).json({ message: 'Ca khám này đã được đặt hoặc không tồn tại' });
     }
 
@@ -24,10 +29,6 @@ exports.bookAppointment = async (req, res) => {
     });
 
     await appointment.save();
-
-    // Mark schedule as unavailable
-    schedule.isAvailable = false;
-    await schedule.save();
 
     // Gửi email thông báo
     const patient = await User.findById(patientId);
@@ -121,6 +122,24 @@ exports.getAllAppointments = async (req, res) => {
       .sort({ date: -1 });
 
     res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+exports.updatePaymentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { paymentStatus } = req.body;
+    
+    if (!['Unpaid', 'Paid', 'Refunded'].includes(paymentStatus)) {
+      return res.status(400).json({ message: 'Trạng thái thanh toán không hợp lệ' });
+    }
+
+    const appointment = await Appointment.findByIdAndUpdate(id, { paymentStatus }, { new: true }).populate('patientId', 'name email');
+    if (!appointment) return res.status(404).json({ message: 'Không tìm thấy lịch hẹn' });
+    
+    res.json(appointment);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }

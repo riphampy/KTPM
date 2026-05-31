@@ -14,6 +14,10 @@ exports.createPrescription = async (req, res) => {
       return res.status(403).json({ message: 'Không tìm thấy lịch hẹn hoặc không có quyền' });
     }
 
+    if (fee !== undefined && Number(fee) < 0) {
+      return res.status(400).json({ message: 'Phí khám bệnh không được là số âm' });
+    }
+
     const prescription = new Prescription({
       appointmentId,
       patientId: appointment.patientId,

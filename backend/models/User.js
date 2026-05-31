@@ -24,7 +24,8 @@ const userSchema = new mongoose.Schema({
   gender: { type: String, enum: ['Male', 'Female', 'Other'] },
   address: { type: String },
   bloodType: { type: String },
-  departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' } // For doctors
+  departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' }, // For doctors
+  isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

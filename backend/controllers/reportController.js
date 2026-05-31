@@ -32,7 +32,7 @@ exports.getDashboardStats = async (req, res) => {
 
     // Tổng doanh thu
     const revenueResult = await Appointment.aggregate([
-      { $match: { status: 'Completed' } },
+      { $match: { paymentStatus: 'Paid' } },
       { $group: { _id: null, totalRevenue: { $sum: '$fee' } } }
     ]);
     const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;

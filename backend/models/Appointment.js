@@ -8,6 +8,7 @@ const appointmentSchema = new mongoose.Schema({
   shift: { type: String, required: true },
   symptoms: { type: String },
   status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'], default: 'Pending' },
+  paymentStatus: { type: String, enum: ['Unpaid', 'Paid', 'Refunded'], default: 'Unpaid' },
   fee: { type: Number, default: 150000 }
 }, { timestamps: true });
 

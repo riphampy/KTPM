@@ -75,6 +75,17 @@ function PatientDashboard({ user, activeTab }) {
     }
   };
 
+  const handleCancelAppointment = async (appId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn hủy lịch hẹn này?')) return;
+    try {
+      await api.put(`/appointments/${appId}/status`, { status: 'Cancelled' });
+      alert('Đã hủy lịch hẹn thành công');
+      fetchMyAppointments();
+    } catch (err) {
+      alert('Lỗi khi hủy: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
   const getStatusColor = (status) => {
     if (status === 'Pending') return 'warning';
     if (status === 'Confirmed') return 'info';
@@ -157,7 +168,14 @@ function PatientDashboard({ user, activeTab }) {
                     </React.Fragment>
                   } 
                 />
-                <Chip label={getStatusText(app.status)} color={getStatusColor(app.status)} variant="outlined" />
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                  <Chip label={getStatusText(app.status)} color={getStatusColor(app.status)} variant="outlined" />
+                  {(app.status === 'Pending' || app.status === 'Confirmed') && (
+                    <Button size="small" variant="outlined" color="error" onClick={() => handleCancelAppointment(app._id)}>
+                      Hủy hẹn
+                    </Button>
+                  )}
+                </Box>
               </ListItem>
             ))}
             {appointments.length === 0 && <Typography>Bạn chưa có lịch hẹn nào.</Typography>}

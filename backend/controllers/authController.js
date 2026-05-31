@@ -101,7 +101,8 @@ exports.forgotPassword = async (req, res) => {
     await new ResetToken({ userId: user._id, token }).save();
 
     // Gửi email
-    const resetUrl = `http://localhost:5173/reset-password?token=${token}&id=${user._id}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}&id=${user._id}`;
     const htmlContent = `
       <h3>Yêu cầu đặt lại mật khẩu</h3>
       <p>Xin chào ${user.name},</p>
