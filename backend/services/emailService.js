@@ -1,20 +1,34 @@
 const nodemailer = require('nodemailer');
 
-// Cấu hình Ethereal Email để test (sẽ tự động in ra URL xem email trong console)
+// Cấu hình Email
 let transporter;
 
 const initTransporter = async () => {
   if (!transporter) {
-    const testAccount = await nodemailer.createTestAccount();
-    transporter = nodemailer.createTransport({
-      host: testAccount.smtp.host,
-      port: testAccount.smtp.port,
-      secure: testAccount.smtp.secure,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      // Dùng Gmail thật nếu có config trong .env
+      transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+      console.log('✅ Hệ thống Email đã kết nối bằng Gmail thật.');
+    } else {
+      // Dùng Ethereal Email để test
+      const testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
+        host: testAccount.smtp.host,
+        port: testAccount.smtp.port,
+        secure: testAccount.smtp.secure,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      console.log('⚠️ Hệ thống đang dùng Ethereal (Test mô phỏng).');
+    }
   }
   return transporter;
 };
@@ -32,7 +46,9 @@ exports.sendEmail = async (to, subject, htmlContent, attachments = []) => {
     });
 
     console.log(`[Email] Đã gửi email tới: ${to}`);
-    console.log(`[Email] URL để xem email: ${nodemailer.getTestMessageUrl(info)}`);
+    if (!process.env.EMAIL_USER) {
+      console.log(`[Email] URL để xem email: ${nodemailer.getTestMessageUrl(info)}`);
+    }
     return true;
   } catch (error) {
     console.error('Lỗi khi gửi email:', error);

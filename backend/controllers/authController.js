@@ -9,10 +9,18 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, role, phone, dateOfBirth, gender, address, bloodType, departmentId } = req.body;
     
-    // Check if user exists
+    // Check if email exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email đã tồn tại' });
+    }
+
+    // Check if phone exists (if provided)
+    if (phone) {
+      const existingPhone = await User.findOne({ phone });
+      if (existingPhone) {
+        return res.status(400).json({ message: 'Số điện thoại đã được đăng ký' });
+      }
     }
 
     // Hash password
