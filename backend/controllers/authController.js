@@ -8,7 +8,7 @@ const emailService = require('../services/emailService');
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role, phone, dateOfBirth, gender, address, bloodType, departmentId } = req.body;
-    
+
     // Check if email exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -101,8 +101,7 @@ exports.forgotPassword = async (req, res) => {
     await new ResetToken({ userId: user._id, token }).save();
 
     // Gửi email
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const resetUrl = `${frontendUrl}/reset-password?token=${token}&id=${user._id}`;
+    const resetUrl = `http://localhost:5173/reset-password?token=${token}&id=${user._id}`;
     const htmlContent = `
       <h3>Yêu cầu đặt lại mật khẩu</h3>
       <p>Xin chào ${user.name},</p>
@@ -111,14 +110,9 @@ exports.forgotPassword = async (req, res) => {
       <p>Liên kết này sẽ hết hạn trong 1 giờ.</p>
     `;
 
-    try {
-      await emailService.sendEmail(user.email, 'Khôi phục mật khẩu - Smart Hospital', htmlContent);
-      console.log('[Email] Forgot password email sent successfully.');
-      res.json({ message: 'Link khôi phục mật khẩu đã được gửi qua email của bạn.' });
-    } catch (mailErr) {
-      console.error('[Email] Error sending forgot password email:', mailErr);
-      return res.status(500).json({ message: 'Lỗi khi gửi email khôi phục. Vui lòng thử lại sau.' });
-    }
+    await emailService.sendEmail(user.email, 'Khôi phục mật khẩu - Smart Hospital', htmlContent);
+
+    res.json({ message: 'Link khôi phục mật khẩu đã được gửi qua email của bạn.' });
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }
@@ -127,7 +121,7 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   try {
     const { id, token, newPassword } = req.body;
-    
+
     // Kiểm tra token hợp lệ
     const resetToken = await ResetToken.findOne({ userId: id, token });
     if (!resetToken) return res.status(400).json({ message: 'Token không hợp lệ hoặc đã hết hạn.' });

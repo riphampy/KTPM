@@ -149,6 +149,11 @@ function PatientDashboard({ user, activeTab }) {
                     <React.Fragment>
                       <Typography variant="body2" component="span" display="block">Ngày: {new Date(app.date).toLocaleDateString()} - Ca: {app.shift}</Typography>
                       <Typography variant="body2" component="span" display="block">Triệu chứng: {app.symptoms}</Typography>
+                      {app.status === 'Completed' && (
+                        <Typography variant="body2" component="span" display="block" color="error" fontWeight="bold">
+                          Phí khám: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(app.fee || 0)}
+                        </Typography>
+                      )}
                     </React.Fragment>
                   } 
                 />

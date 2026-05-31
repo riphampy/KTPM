@@ -24,26 +24,21 @@ exports.bookAppointment = async (req, res) => {
     });
 
     await appointment.save();
-    
+
     // Mark schedule as unavailable
     schedule.isAvailable = false;
     await schedule.save();
 
     // Gửi email thông báo
     const patient = await User.findById(patientId);
-    if (patient && patient.email) {
+    if (patient) {
       const emailHtml = `
         <h3>Đặt lịch khám thành công</h3>
         <p>Xin chào ${patient.name},</p>
         <p>Yêu cầu đặt lịch khám của bạn vào ngày <strong>${new Date(date).toLocaleDateString('vi-VN')}</strong> (Ca: ${shift}) đã được ghi nhận và đang chờ bác sĩ xác nhận.</p>
         <p>Cảm ơn bạn đã sử dụng dịch vụ của Smart Hospital!</p>
       `;
-      try {
-        await emailService.sendEmail(patient.email, 'Xác nhận đặt lịch khám - Smart Hospital', emailHtml);
-        console.log('[Email] Booking confirmation email sent successfully.');
-      } catch (mailErr) {
-        console.error('[Email] Error sending booking confirmation email:', mailErr);
-      }
+      emailService.sendEmail(patient.email, 'Xác nhận đặt lịch khám - Smart Hospital', emailHtml);
     }
 
     res.status(201).json(appointment);
@@ -64,7 +59,7 @@ exports.getMyAppointments = async (req, res) => {
       .populate('patientId', 'name email')
       .populate('doctorId', 'name')
       .sort({ date: 1 });
-      
+
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
@@ -75,9 +70,9 @@ exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    
+
     const appointment = await Appointment.findByIdAndUpdate(id, { status }, { new: true }).populate('patientId', 'name email');
-    
+
     // Nếu hủy lịch, giải phóng lại ca khám
     if (status === 'Cancelled') {
       const schedule = await DoctorSchedule.findById(appointment.scheduleId);
@@ -112,6 +107,20 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 
     res.json(appointment);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+exports.getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await Appointment.find()
+      .populate('patientId', 'name email phone')
+      .populate('doctorId', 'name email')
+      .populate('scheduleId')
+      .sort({ date: -1 });
+
+    res.json(appointments);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }

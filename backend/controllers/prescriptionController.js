@@ -5,7 +5,7 @@ const emailService = require('../services/emailService');
 
 exports.createPrescription = async (req, res) => {
   try {
-    const { appointmentId, diagnosis, medications, notes } = req.body;
+    const { appointmentId, diagnosis, medications, notes, fee } = req.body;
     const doctorId = req.user.id;
 
     // Verify appointment exists and belongs to this doctor
@@ -27,6 +27,9 @@ exports.createPrescription = async (req, res) => {
 
     // Mark appointment as completed
     appointment.status = 'Completed';
+    if (fee !== undefined) {
+      appointment.fee = Number(fee);
+    }
     await appointment.save();
 
     // Tạo file PDF

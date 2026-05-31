@@ -40,3 +40,37 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }
 };
+
+const bcrypt = require('bcrypt');
+
+exports.createUser = async (req, res) => {
+  try {
+    const { name, email, password, role, phone, dateOfBirth, gender, address, bloodType, departmentId } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'Email đã tồn tại' });
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password || '123456', salt);
+
+    const user = new User({
+      name, email, password: hashedPassword, role: role || 'patient',
+      phone, dateOfBirth, gender, address, bloodType, departmentId
+    });
+
+    await user.save();
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByIdAndDelete(id);
+    if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+    res.json({ message: 'Xóa người dùng thành công' });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};

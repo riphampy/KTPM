@@ -16,7 +16,7 @@ function Dashboard() {
       <Box sx={{ flexGrow: 1, p: 3, overflow: 'auto' }}>
         {user.role === 'doctor' && <DoctorDashboard user={user} activeTab={activeTab} />}
         {user.role === 'patient' && <PatientDashboard user={user} activeTab={activeTab} />}
-        {user.role === 'admin' && <AdminDashboard activeTab={activeTab} />}
+        {user.role === 'admin' && <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} />}
       </Box>
     </Box>
   );

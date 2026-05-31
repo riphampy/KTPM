@@ -12,6 +12,7 @@ function DoctorDashboard({ user, activeTab }) {
   const [diagnosis, setDiagnosis] = useState('');
   const [medications, setMedications] = useState('');
   const [notes, setNotes] = useState('');
+  const [fee, setFee] = useState(150000);
   const [sharedRecords, setSharedRecords] = useState([]);
   const [openRecordsDialog, setOpenRecordsDialog] = useState(false);
 
@@ -80,11 +81,12 @@ function DoctorDashboard({ user, activeTab }) {
         appointmentId: selectedAppt._id,
         diagnosis,
         medications: [{ name: medications, dosage: 'Theo chỉ định', duration: '7 ngày', instructions: '' }],
-        notes
+        notes,
+        fee
       });
       alert('Kê đơn thành công!');
       setOpenDialog(false);
-      setDiagnosis(''); setMedications(''); setNotes('');
+      setDiagnosis(''); setMedications(''); setNotes(''); setFee(150000);
       fetchAppointments(); // refresh
     } catch (err) {
       alert('Lỗi: ' + (err.response?.data?.message || err.message));
@@ -266,6 +268,7 @@ function DoctorDashboard({ user, activeTab }) {
           <TextField margin="dense" label="Chẩn đoán bệnh" fullWidth value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
           <TextField margin="dense" label="Thuốc (Tên thuốc - Liều lượng)" fullWidth value={medications} onChange={e => setMedications(e.target.value)} />
           <TextField margin="dense" label="Ghi chú thêm" fullWidth multiline rows={3} value={notes} onChange={e => setNotes(e.target.value)} />
+          <TextField margin="dense" label="Phí khám bệnh (VNĐ)" type="number" fullWidth value={fee} onChange={e => setFee(e.target.value)} />
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={() => setOpenDialog(false)}>Hủy</Button>
