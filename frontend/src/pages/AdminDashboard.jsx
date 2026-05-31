@@ -1,29 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tab, Button, Grid, Card, CardContent } from '@mui/material';
+import { Box, Typography, Paper, Grid, Card, TextField, Button, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import PeopleIcon from '@mui/icons-material/People';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import TimelineIcon from '@mui/icons-material/Timeline';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-function AdminDashboard() {
-  const [tabValue, setTabValue] = useState(0);
-  const [users, setUsers] = useState([]);
-  const [stats, setStats] = useState(null);
+function AdminDashboard({ activeTab }) {
+  const [stats, setStats] = useState({ totalDoctors: 0, totalPatients: 0, totalAppointments: 0, todaySessions: 0 });
 
   useEffect(() => {
-    fetchUsers();
     fetchStats();
   }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUsers(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const fetchStats = async () => {
     try {
@@ -31,147 +21,130 @@ function AdminDashboard() {
       const res = await axios.get('http://localhost:5000/api/reports/stats', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setStats(res.data);
+      if (res.data) {
+        setStats({
+          totalDoctors: res.data.totalDoctors || 0,
+          totalPatients: res.data.totalPatients || 0,
+          totalAppointments: res.data.completedAppointments || 0,
+          todaySessions: 0 // Mocking today sessions
+        });
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleExportExcel = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/reports/export-excel', {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob'
-      });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'DoanhThu_SmartHospital.xlsx');
-      document.body.appendChild(link);
-      link.click();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const statusCards = [
+    { title: 'Bác sĩ', count: stats.totalDoctors, icon: <LocalHospitalIcon color="primary" /> },
+    { title: 'Bệnh nhân', count: stats.totalPatients, icon: <PeopleIcon color="primary" /> },
+    { title: 'Lịch mới', count: stats.totalAppointments, icon: <BookOnlineIcon color="primary" /> },
+    { title: 'Phiên khám h.nay', count: stats.todaySessions, icon: <TimelineIcon color="primary" /> },
+  ];
+
+  if (activeTab !== 0) {
+    return <Typography sx={{ mt: 5 }} align="center">Nội dung tab {activeTab} đang được xây dựng. Vui lòng chọn Trang chủ.</Typography>;
+  }
 
   return (
-    <Box>
-      <Paper sx={{ mb: 3 }}>
-        <Tabs value={tabValue} onChange={(e, val) => setTabValue(val)} centered>
-          <Tab label="Quản lý Người dùng" />
-          <Tab label="Báo cáo Thống kê" />
-        </Tabs>
-      </Paper>
-
-      {tabValue === 0 && (
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>Danh sách Người dùng</Typography>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tên</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Vai trò</TableCell>
-                  <TableCell>Ngày đăng ký</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((u) => (
-                  <TableRow key={u._id}>
-                    <TableCell>{u.name}</TableCell>
-                    <TableCell>{u.email}</TableCell>
-                    <TableCell>{u.role}</TableCell>
-                    <TableCell>{new Date(u.createdAt).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      )}
-
-      {tabValue === 1 && stats && (
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-            <Typography variant="h5" color="primary" fontWeight="bold">Tổng quan Hệ thống</Typography>
-            <Button variant="contained" color="secondary" onClick={handleExportExcel}>
-              Xuất File Excel Doanh Thu
-            </Button>
-          </Box>
-          
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={3}>
-              <Card sx={{ bgcolor: '#e3f2fd' }}>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>Tổng số Bệnh nhân</Typography>
-                  <Typography variant="h3" color="primary">{stats.totalPatients}</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Card sx={{ bgcolor: '#f3e5f5' }}>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>Tổng số Bác sĩ</Typography>
-                  <Typography variant="h3" color="info.main">{stats.totalDoctors}</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Card sx={{ bgcolor: '#e8f5e9' }}>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>Lịch khám Hoàn thành</Typography>
-                  <Typography variant="h3" color="secondary">{stats.completedAppointments}</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Card sx={{ bgcolor: '#fff3e0' }}>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom>Tổng Doanh thu (VNĐ)</Typography>
-                  <Typography variant="h4" color="warning.main">
-                    {new Intl.NumberFormat('vi-VN').format(stats.totalRevenue)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, height: 400 }}>
-                <Typography variant="h6" gutterBottom align="center">Top 3 Bác sĩ (Doanh thu/Lịch khám)</Typography>
-                <ResponsiveContainer width="100%" height="90%">
-                  <BarChart data={stats.topDoctors}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="appointmentsCompleted" name="Số ca hoàn thành" fill="#00838F" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, height: 400 }}>
-                <Typography variant="h6" gutterBottom align="center">Top 4 Bệnh nhân VIP</Typography>
-                <ResponsiveContainer width="100%" height="90%">
-                  <BarChart data={stats.topPatients}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="visitCount" name="Số lần khám" fill="#FF7043" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Paper>
-            </Grid>
-          </Grid>
+    <Box sx={{ width: '100%', px: 2 }}>
+      {/* Topbar */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5 }}>
+        <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, maxWidth: '600px' }}>
+          <TextField 
+            fullWidth 
+            size="small" 
+            placeholder="Tìm kiếm tên Bác sĩ hoặc Email"
+            InputProps={{
+              startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
+              sx: { bgcolor: '#fff' }
+            }}
+          />
+          <Button variant="contained" disableElevation sx={{ bgcolor: '#e3f2fd', color: '#1565c0', fontWeight: 'bold', minWidth: '100px' }}>
+            Tìm kiếm
+          </Button>
         </Box>
-      )}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="caption" color="text.secondary">Ngày hôm nay</Typography>
+            <Typography variant="body1" fontWeight="bold">{new Date().toISOString().split('T')[0]}</Typography>
+          </Box>
+          <Paper elevation={0} sx={{ p: 1, bgcolor: '#f5f5f5', borderRadius: 2 }}>
+            <CalendarTodayIcon />
+          </Paper>
+        </Box>
+      </Box>
+
+      {/* Status Section */}
+      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>Trạng thái</Typography>
+      <Grid container spacing={3} sx={{ mb: 6 }}>
+        {statusCards.map((card, idx) => (
+          <Grid item xs={12} sm={6} md={3} key={idx}>
+            <Card elevation={0} sx={{ p: 2, border: '1px solid #e0e0e0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box>
+                <Typography variant="h4" color="primary" fontWeight="bold">{card.count}</Typography>
+                <Typography variant="body2" color="text.secondary" fontWeight="bold">{card.title}</Typography>
+              </Box>
+              <Box sx={{ bgcolor: '#f5f5f5', p: 1.5, borderRadius: 1 }}>
+                {card.icon}
+              </Box>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Upcoming Sections */}
+      <Grid container spacing={4}>
+        {/* Appointments */}
+        <Grid item xs={12} md={6}>
+          <Typography variant="h6" color="primary" fontWeight="bold" align="center" gutterBottom>
+            Lịch hẹn sắp tới cho đến Thứ Sáu tuần sau
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+            Truy cập nhanh Lịch hẹn sắp tới trong 7 ngày.<br/>
+            Chi tiết có trong phần @Lịch hẹn.
+          </Typography>
+          
+          <Paper elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', borderBottom: '2px solid #0056D2', p: 2 }}>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Mã lịch hẹn</Typography>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Tên bệnh nhân</Typography>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Bác sĩ</Typography>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Phiên khám</Typography>
+            </Box>
+            <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
+              <img src="/empty-state.png" alt="Empty state" style={{ height: '120px' }} />
+            </Box>
+            <Button fullWidth variant="contained" color="primary" disableElevation sx={{ borderRadius: 0, py: 1.5, fontWeight: 'bold' }}>
+              Xem tất cả Lịch hẹn
+            </Button>
+          </Paper>
+        </Grid>
+
+        {/* Sessions */}
+        <Grid item xs={12} md={6}>
+          <Typography variant="h6" color="primary" fontWeight="bold" align="center" gutterBottom>
+            Phiên khám sắp tới cho đến Thứ Sáu tuần sau
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+            Truy cập nhanh Phiên khám đã được lên lịch trong 7 ngày.<br/>
+            Thêm, Xóa và nhiều tính năng khác trong phần @Lịch làm việc.
+          </Typography>
+          
+          <Paper elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', borderBottom: '2px solid #0056D2', p: 2 }}>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Tiêu đề phiên</Typography>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Bác sĩ</Typography>
+              <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 'bold' }} align="center">Ngày & Giờ</Typography>
+            </Box>
+            <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
+              <img src="/empty-state.png" alt="Empty state" style={{ height: '120px' }} />
+            </Box>
+            <Button fullWidth variant="contained" color="primary" disableElevation sx={{ borderRadius: 0, py: 1.5, fontWeight: 'bold' }}>
+              Xem tất cả Phiên khám
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

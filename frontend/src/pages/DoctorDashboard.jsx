@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Grid, TextField, MenuItem, Select, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
 
-function DoctorDashboard({ user }) {
-  const [tabValue, setTabValue] = useState(0);
+function DoctorDashboard({ user, activeTab }) {
   const [date, setDate] = useState('');
   const [shift, setShift] = useState('Morning');
   const [schedules, setSchedules] = useState([]);
@@ -113,17 +112,8 @@ function DoctorDashboard({ user }) {
         <Typography variant="subtitle1" sx={{ mt: 1, opacity: 0.8 }}>Xin chào bác sĩ {user.name || ''}, chúc bạn một ngày làm việc hiệu quả!</Typography>
       </Box>
 
-      <Paper sx={{ mb: 4, borderRadius: '8px', overflow: 'hidden' }}>
-        <Tabs value={tabValue} onChange={(e, val) => setTabValue(val)} indicatorColor="primary" textColor="primary" variant="fullWidth" sx={{ bgcolor: 'white' }}>
-          <Tab label="Lịch làm việc của tôi" sx={{ fontWeight: 'bold' }} />
-          <Tab label={`Chờ duyệt (${pendingAppts.length})`} sx={{ fontWeight: 'bold' }} />
-          <Tab label={`Hôm nay khám (${confirmedAppts.length})`} sx={{ fontWeight: 'bold' }} />
-          <Tab label="Lịch sử khám" sx={{ fontWeight: 'bold' }} />
-        </Tabs>
-      </Paper>
-
       {/* Tab 0: Lịch làm việc */}
-      {tabValue === 0 && (
+      {activeTab === 0 && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 3 }}>
@@ -176,7 +166,7 @@ function DoctorDashboard({ user }) {
       )}
 
       {/* Tab 1: Chờ duyệt */}
-      {tabValue === 1 && (
+      {activeTab === 1 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom fontWeight="bold">Lịch hẹn chờ xác nhận</Typography>
           <TableContainer>
@@ -211,7 +201,7 @@ function DoctorDashboard({ user }) {
       )}
 
       {/* Tab 2: Hôm nay khám */}
-      {tabValue === 2 && (
+      {activeTab === 2 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom fontWeight="bold">Bệnh nhân cần khám</Typography>
           <TableContainer>
@@ -246,7 +236,7 @@ function DoctorDashboard({ user }) {
       )}
 
       {/* Tab 3: Lịch sử */}
-      {tabValue === 3 && (
+      {activeTab === 3 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom fontWeight="bold">Lịch sử khám bệnh</Typography>
           <TableContainer>

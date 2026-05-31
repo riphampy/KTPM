@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Container, Paper } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Box, Button, TextField, Typography, Paper } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,60 +24,72 @@ function Login() {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={3} sx={{ mt: 8, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">
-          Đăng nhập Smart Hospital
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#F7F9FD' }}>
+      <Paper elevation={0} sx={{ p: 6, width: '100%', maxWidth: '450px', borderRadius: '4px', border: '1px solid #ebebeb' }}>
+        <Typography component="h1" variant="h5" align="center" sx={{ fontWeight: 'bold', mb: 1 }}>
+          Chào mừng trở lại!
         </Typography>
-        <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
-          {error && <Typography color="error" variant="body2">{error}</Typography>}
+        <Typography variant="body2" align="center" sx={{ color: 'text.secondary', mb: 4 }}>
+          Đăng nhập vào tài khoản của bạn
+        </Typography>
+
+        <Box component="form" onSubmit={handleLogin}>
+          {error && <Typography color="error" variant="body2" sx={{ mb: 2, textAlign: 'center' }}>{error}</Typography>}
+          
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>Email:</Typography>
           <TextField
-            margin="normal"
-            required
             fullWidth
+            size="small"
             id="email"
-            label="Địa chỉ Email"
+            placeholder="Địa chỉ Email"
             name="email"
-            autoComplete="email"
-            autoFocus
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            sx={{ mb: 3 }}
+            InputProps={{ sx: { bgcolor: '#fafafa', '& fieldset': { borderColor: '#e0e0e0' } } }}
           />
+
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>Mật khẩu:</Typography>
           <TextField
-            margin="normal"
-            required
             fullWidth
+            size="small"
             name="password"
-            label="Mật khẩu"
+            placeholder="Mật khẩu"
             type="password"
             id="password"
-            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            sx={{ mb: 4 }}
+            InputProps={{ sx: { bgcolor: '#fafafa', '& fieldset': { borderColor: '#e0e0e0' } } }}
           />
+
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            color="primary"
+            disableElevation
+            sx={{ py: 1.2, mb: 4, fontWeight: 'bold' }}
           >
             Đăng nhập
           </Button>
-          <Box textAlign="center" mt={2}>
-            <Link to="/forgot-password" style={{ textDecoration: 'none', marginRight: '15px' }}>
-              <Typography variant="body2" color="secondary">
-                Quên mật khẩu?
-              </Typography>
+
+          <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
+            Bạn chưa có tài khoản?{' '}
+            <Link to="/register" style={{ textDecoration: 'none', color: '#000', fontWeight: 'bold' }}>
+              Đăng ký ngay
             </Link>
-            <Link to="/register" style={{ textDecoration: 'none' }}>
-              <Typography variant="body2" color="primary">
-                Chưa có tài khoản? Đăng ký ngay
-              </Typography>
+          </Typography>
+          
+          <Box textAlign="center" mt={2}>
+            <Link to="/forgot-password" style={{ textDecoration: 'none', color: '#0056D2', fontSize: '0.875rem' }}>
+              Quên mật khẩu?
             </Link>
           </Box>
         </Box>
       </Paper>
-    </Container>
+    </Box>
   );
 }
 

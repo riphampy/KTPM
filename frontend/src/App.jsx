@@ -14,15 +14,15 @@ import ResetPassword from './pages/ResetPassword';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#0A76D8', // eDoc blue
+      main: '#0056D2', // eDoc blue
       light: '#5185ff',
-      dark: '#006dd3',
+      dark: '#0043a4',
     },
     secondary: {
       main: '#1969AA',
     },
     background: {
-      default: '#f7f9fd', // Clean light gray similar to eDoc
+      default: '#F7F9FD', // Clean light gray similar to eDoc
     },
   },
   typography: {
@@ -36,7 +36,7 @@ const theme = createTheme({
     button: { textTransform: 'none', fontWeight: 500, letterSpacing: '0.5px' },
   },
   shape: {
-    borderRadius: 5,
+    borderRadius: 4,
   },
   components: {
     MuiButton: {
@@ -72,7 +72,6 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

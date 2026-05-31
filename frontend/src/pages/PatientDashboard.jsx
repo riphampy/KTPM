@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, Grid, List, ListItem, ListItemText, ListItemButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, Chip } from '@mui/material';
 import axios from 'axios';
 
-function PatientDashboard({ user }) {
-  const [tabValue, setTabValue] = useState(0);
+function PatientDashboard({ user, activeTab }) {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [schedules, setSchedules] = useState([]);
@@ -98,15 +97,7 @@ function PatientDashboard({ user }) {
 
   return (
     <Box>
-      <Paper sx={{ mb: 3 }}>
-        <Tabs value={tabValue} onChange={(e, val) => setTabValue(val)} indicatorColor="primary" textColor="primary" variant="fullWidth">
-          <Tab label="Đặt Lịch Khám" />
-          <Tab label={`Lịch hẹn của tôi (${appointments.length})`} />
-          <Tab label={`Hồ sơ & Đơn thuốc (${prescriptions.length})`} />
-        </Tabs>
-      </Paper>
-
-      {tabValue === 0 && (
+      {activeTab === 0 && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 2, height: '100%' }}>
@@ -152,7 +143,7 @@ function PatientDashboard({ user }) {
         </Grid>
       )}
 
-      {tabValue === 1 && (
+      {activeTab === 1 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom fontWeight="bold">Lịch hẹn của tôi</Typography>
           <List>
@@ -175,7 +166,7 @@ function PatientDashboard({ user }) {
         </Paper>
       )}
 
-      {tabValue === 2 && (
+      {activeTab === 2 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom fontWeight="bold">Đơn thuốc & Chẩn đoán</Typography>
           <Grid container spacing={3}>
