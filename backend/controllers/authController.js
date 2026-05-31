@@ -101,7 +101,8 @@ exports.forgotPassword = async (req, res) => {
     await new ResetToken({ userId: user._id, token }).save();
 
     // Gửi email
-    const resetUrl = `http://localhost:5173/reset-password?token=${token}&id=${user._id}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}&id=${user._id}`;
     const htmlContent = `
       <h3>Yêu cầu đặt lại mật khẩu</h3>
       <p>Xin chào ${user.name},</p>
@@ -110,9 +111,14 @@ exports.forgotPassword = async (req, res) => {
       <p>Liên kết này sẽ hết hạn trong 1 giờ.</p>
     `;
 
-    await emailService.sendEmail(user.email, 'Khôi phục mật khẩu - Smart Hospital', htmlContent);
-
-    res.json({ message: 'Link khôi phục mật khẩu đã được gửi qua email của bạn.' });
+    try {
+      await emailService.sendEmail(user.email, 'Khôi phục mật khẩu - Smart Hospital', htmlContent);
+      console.log('[Email] Forgot password email sent successfully.');
+      res.json({ message: 'Link khôi phục mật khẩu đã được gửi qua email của bạn.' });
+    } catch (mailErr) {
+      console.error('[Email] Error sending forgot password email:', mailErr);
+      return res.status(500).json({ message: 'Lỗi khi gửi email khôi phục. Vui lòng thử lại sau.' });
+    }
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }

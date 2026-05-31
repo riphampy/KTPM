@@ -28,7 +28,11 @@ const initCronJobs = () => {
             <p>Bạn có lịch hẹn khám với Bác sĩ ${app.doctorId.name} vào ngày mai (${new Date(app.date).toLocaleDateString()}), ca ${app.shift}.</p>
             <p>Vui lòng đến đúng giờ. Xin cảm ơn!</p>
           `;
-          await emailService.sendEmail(app.patientId.email, 'Nhắc nhở lịch khám - Smart Hospital', htmlContent);
+          try {
+            await emailService.sendEmail(app.patientId.email, 'Nhắc nhở lịch khám - Smart Hospital', htmlContent);
+          } catch (mailErr) {
+            console.error(`[CRON] Lỗi gửi mail nhắc lịch cho ${app.patientId.email}:`, mailErr);
+          }
         }
       }
     } catch (error) {
@@ -60,7 +64,11 @@ const initCronJobs = () => {
             <ul>${medsList}</ul>
             <p>Chúc bạn mau khỏe!</p>
           `;
-          await emailService.sendEmail(rx.patientId.email, 'Nhắc nhở uống thuốc - Smart Hospital', htmlContent);
+          try {
+            await emailService.sendEmail(rx.patientId.email, 'Nhắc nhở uống thuốc - Smart Hospital', htmlContent);
+          } catch (mailErr) {
+            console.error(`[CRON] Lỗi gửi mail nhắc uống thuốc cho ${rx.patientId.email}:`, mailErr);
+          }
         }
       }
     } catch (error) {

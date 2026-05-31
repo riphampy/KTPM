@@ -31,14 +31,19 @@ exports.bookAppointment = async (req, res) => {
 
     // Gửi email thông báo
     const patient = await User.findById(patientId);
-    if (patient) {
+    if (patient && patient.email) {
       const emailHtml = `
         <h3>Đặt lịch khám thành công</h3>
         <p>Xin chào ${patient.name},</p>
         <p>Yêu cầu đặt lịch khám của bạn vào ngày <strong>${new Date(date).toLocaleDateString('vi-VN')}</strong> (Ca: ${shift}) đã được ghi nhận và đang chờ bác sĩ xác nhận.</p>
         <p>Cảm ơn bạn đã sử dụng dịch vụ của Smart Hospital!</p>
       `;
-      emailService.sendEmail(patient.email, 'Xác nhận đặt lịch khám - Smart Hospital', emailHtml);
+      try {
+        await emailService.sendEmail(patient.email, 'Xác nhận đặt lịch khám - Smart Hospital', emailHtml);
+        console.log('[Email] Booking confirmation email sent successfully.');
+      } catch (mailErr) {
+        console.error('[Email] Error sending booking confirmation email:', mailErr);
+      }
     }
 
     res.status(201).json(appointment);
