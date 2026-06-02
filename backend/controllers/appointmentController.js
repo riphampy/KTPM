@@ -72,6 +72,11 @@ exports.updateAppointmentStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
+    // Security check: Patient can only cancel their own appointments
+    if (req.user.role === 'patient' && status !== 'Cancelled') {
+      return res.status(403).json({ message: 'Bệnh nhân chỉ được phép hủy lịch khám' });
+    }
+
     const appointment = await Appointment.findByIdAndUpdate(id, { status }, { new: true }).populate('patientId', 'name email');
 
     // Nếu hủy lịch, giải phóng lại ca khám
